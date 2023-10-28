@@ -29,24 +29,24 @@ func RootCommand() {
 				panic(err)
 			}
 
-			packages, err := source.LoadSources(sourcePath)
+			project, err := source.LoadSources(sourcePath)
 			if err != nil {
 				panic(err)
 			}
 
-			packages = cleaner.CleanData(packages)
+			project = cleaner.CleanData(project)
 
-			packages = complexity.AddComplexity(packages)
+			project = complexity.AddComplexity(project)
 
-			if coveragePath == "-" {
-				packages, err = coverage.LoadCoverage(packages, coveragePath)
+			if coveragePath != "-" {
+				project, err = coverage.LoadCoverage(project, coveragePath)
+
+				if err != nil {
+					panic(err)
+				}
 			}
 
-			if err != nil {
-				panic(err)
-			}
-
-			err = writer.WriteXML(sourcePath, packages, outputPath)
+			err = writer.WriteXML(sourcePath, project, outputPath)
 			if err != nil {
 				panic(err)
 			}

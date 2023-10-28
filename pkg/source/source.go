@@ -11,7 +11,7 @@ import (
 	"github.com/Fabianexe/go-jenkins-coverage/pkg/entity"
 )
 
-func LoadSources(path string) ([]*entity.Package, error) {
+func LoadSources(path string) (*entity.Project, error) {
 	goPath := make(map[string]struct{}, 1000)
 	err := filepath.Walk(path, func(path string, info os.FileInfo, err error) error {
 		if filepath.Ext(path) == ".go" {
@@ -87,5 +87,5 @@ func LoadSources(path string) ([]*entity.Package, error) {
 		allPackages = append(allPackages, pack)
 	}
 
-	return allPackages, nil
+	return &entity.Project{Packages: allPackages}, nil
 }

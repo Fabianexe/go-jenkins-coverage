@@ -7,6 +7,6 @@ import (
 
 // AddComplexity adds complexity metrics to the packages
 // TODO: implement
-func AddComplexity(inpput []*entity.Package) []*entity.Package {
-	return inpput
+func AddComplexity(project *entity.Project) *entity.Project {
+	return project
 }

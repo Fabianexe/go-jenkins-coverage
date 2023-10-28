@@ -6,7 +6,8 @@ import (
 	"github.com/Fabianexe/go-jenkins-coverage/pkg/entity"
 )
 
-func ConvertToCobertura(path string, pkgs []*entity.Package) *Coverage {
+func ConvertToCobertura(path string, project *entity.Project) *Coverage {
+	pkgs := project.Packages
 	coverage := &Coverage{
 		Sources: &Sources{
 			Sources: []*Source{
@@ -15,6 +16,7 @@ func ConvertToCobertura(path string, pkgs []*entity.Package) *Coverage {
 				},
 			},
 		},
+		LineRate: project.LineCoverage.String(),
 	}
 
 	packages := &Packages{
@@ -22,7 +24,8 @@ func ConvertToCobertura(path string, pkgs []*entity.Package) *Coverage {
 	}
 	for _, pkg := range pkgs {
 		packageCov := &Package{
-			Name: pkg.Name,
+			Name:     pkg.Name,
+			LineRate: pkg.LineCoverage.String(),
 		}
 
 		classes := &Classes{
@@ -33,6 +36,7 @@ func ConvertToCobertura(path string, pkgs []*entity.Package) *Coverage {
 			class := &Class{
 				Name:     file.Name,
 				Filename: file.FilePath,
+				LineRate: file.LineCoverage.String(),
 			}
 
 			mmethods := &Methods{
@@ -45,7 +49,8 @@ func ConvertToCobertura(path string, pkgs []*entity.Package) *Coverage {
 
 			for _, method := range file.Methods {
 				xmlMethod := &Method{
-					Name: method.Name,
+					Name:     method.Name,
+					LineRate: method.LineCoverage.String(),
 				}
 
 				methodsLines := &Lines{
@@ -55,6 +60,7 @@ func ConvertToCobertura(path string, pkgs []*entity.Package) *Coverage {
 				for _, line := range method.Lines {
 					xmlLine := &Line{
 						Number: strconv.Itoa(line.Number),
+						Hits:   strconv.Itoa(line.CoverageCount),
 					}
 					methodsLines.Lines = append(methodsLines.Lines, xmlLine)
 					classLines.Lines = append(classLines.Lines, xmlLine)

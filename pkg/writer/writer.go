@@ -9,8 +9,8 @@ import (
 	"github.com/Fabianexe/go-jenkins-coverage/pkg/entity"
 )
 
-func WriteXML(path string, pkgs []*entity.Package, outPath string) error {
-	xmlCoverage := ConvertToCobertura(path, pkgs)
+func WriteXML(path string, project *entity.Project, outPath string) error {
+	xmlCoverage := ConvertToCobertura(path, project)
 
 	outFile, err := os.Create(outPath)
 	if err != nil {

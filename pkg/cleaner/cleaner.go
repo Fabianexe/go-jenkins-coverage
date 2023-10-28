@@ -7,6 +7,6 @@ import (
 
 // CleanData cleanes the package data
 // TODO: implement
-func CleanData(input []*entity.Package) []*entity.Package {
-	return input
+func CleanData(project *entity.Project) *entity.Project {
+	return project
 }
