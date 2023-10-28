@@ -52,9 +52,10 @@ func LoadSources(path string) ([]*entity.Package, error) {
 		}
 		for i, fileAst := range pkg.Syntax {
 			file := &entity.File{
-				Name:    pkg.GoFiles[i],
-				Ast:     fileAst,
-				Methods: make([]*entity.Method, 0, len(fileAst.Decls)),
+				Name:     filepath.Base(pkg.GoFiles[i]),
+				FilePath: pkg.GoFiles[i],
+				Ast:      fileAst,
+				Methods:  make([]*entity.Method, 0, len(fileAst.Decls)),
 			}
 			for _, decl := range fileAst.Decls {
 				if fun, ok := decl.(*ast.FuncDecl); ok {

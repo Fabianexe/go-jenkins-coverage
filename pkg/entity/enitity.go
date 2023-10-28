@@ -13,9 +13,10 @@ type Package struct {
 }
 
 type File struct {
-	Name    string
-	Ast     *ast.File
-	Methods []*Method
+	Name     string
+	FilePath string
+	Ast      *ast.File
+	Methods  []*Method
 }
 
 type Method struct {

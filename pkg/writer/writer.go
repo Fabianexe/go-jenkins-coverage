@@ -3,10 +3,31 @@
 package writer
 
 import (
+	"encoding/xml"
+	"os"
+
 	"github.com/Fabianexe/go-jenkins-coverage/pkg/entity"
 )
 
 func WriteXML(path string, pkgs []*entity.Package, outPath string) error {
+	xmlCoverage := ConvertToCobertura(path, pkgs)
+
+	outFile, err := os.Create(outPath)
+	if err != nil {
+		return err
+	}
+
+	encoder := xml.NewEncoder(outFile)
+	encoder.Indent("", "\t")
+
+	err = encoder.Encode(xmlCoverage)
+	if err != nil {
+		return err
+	}
+
+	if err := outFile.Close(); err != nil {
+		return err
+	}
 
 	return nil
 }

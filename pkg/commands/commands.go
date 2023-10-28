@@ -4,6 +4,9 @@ package commands
 import (
 	"github.com/spf13/cobra"
 
+	"github.com/Fabianexe/go-jenkins-coverage/pkg/cleaner"
+	"github.com/Fabianexe/go-jenkins-coverage/pkg/complexity"
+	"github.com/Fabianexe/go-jenkins-coverage/pkg/coverage"
 	"github.com/Fabianexe/go-jenkins-coverage/pkg/source"
 	"github.com/Fabianexe/go-jenkins-coverage/pkg/writer"
 )
@@ -18,6 +21,15 @@ func RootCommand() {
 				panic(err)
 			}
 			packages, err := source.LoadSources(sourcePath)
+			if err != nil {
+				panic(err)
+			}
+
+			packages = cleaner.CleanData(packages)
+
+			packages = complexity.AddComplexity(packages)
+
+			packages, err = coverage.LoadCoverage(packages, "coverage.out")
 			if err != nil {
 				panic(err)
 			}
