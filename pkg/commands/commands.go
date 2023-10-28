@@ -20,6 +20,15 @@ func RootCommand() {
 			if err != nil {
 				panic(err)
 			}
+			coveragePath, err := cmd.Flags().GetString("coverage")
+			if err != nil {
+				panic(err)
+			}
+			outputPath, err := cmd.Flags().GetString("output")
+			if err != nil {
+				panic(err)
+			}
+
 			packages, err := source.LoadSources(sourcePath)
 			if err != nil {
 				panic(err)
@@ -29,12 +38,15 @@ func RootCommand() {
 
 			packages = complexity.AddComplexity(packages)
 
-			packages, err = coverage.LoadCoverage(packages, "coverage.out")
+			if coveragePath == "-" {
+				packages, err = coverage.LoadCoverage(packages, coveragePath)
+			}
+
 			if err != nil {
 				panic(err)
 			}
 
-			err = writer.WriteXML(sourcePath, packages, "coverage.xml")
+			err = writer.WriteXML(sourcePath, packages, outputPath)
 			if err != nil {
 				panic(err)
 			}
@@ -45,7 +57,21 @@ func RootCommand() {
 		"source",
 		"s",
 		".",
-		"Apply on this branch if not given is determined by selection.\nIf '`.`' given determine branch from current working dir (if branch is needed but not given branch is tried to determined). ",
+		"Give The source path to the go project.",
+	)
+
+	rootCmd.PersistentFlags().StringP(
+		"coverage",
+		"c",
+		"-",
+		"Give the path to the coverage.out file. If omitted no coverage data is considered",
+	)
+
+	rootCmd.PersistentFlags().StringP(
+		"output",
+		"o",
+		"coverage.xml",
+		"The output file name",
 	)
 
 	if err := rootCmd.Execute(); err != nil {
