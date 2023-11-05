@@ -6,7 +6,7 @@ import (
 	"encoding/xml"
 	"os"
 
-	"github.com/Fabianexe/go-jenkins-coverage/pkg/entity"
+	"github.com/Fabianexe/go2jenkins/pkg/entity"
 )
 
 func WriteXML(path string, project *entity.Project, outPath string) error {

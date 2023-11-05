@@ -3,7 +3,7 @@ package writer
 import (
 	"strconv"
 
-	"github.com/Fabianexe/go-jenkins-coverage/pkg/entity"
+	"github.com/Fabianexe/go2jenkins/pkg/entity"
 )
 
 func ConvertToCobertura(path string, project *entity.Project) *Coverage {

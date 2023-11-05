@@ -1,9 +1,9 @@
-module github.com/Fabianexe/go-jenkins-coverage
+module github.com/Fabianexe/go2jenkins
 
 go 1.21.0
 
 require (
-	github.com/spf13/cobra v1.7.0
+	github.com/spf13/cobra v1.8.0
 	golang.org/x/tools v0.14.0
 )
 

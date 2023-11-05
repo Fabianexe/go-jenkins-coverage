@@ -8,7 +8,7 @@ import (
 
 	"golang.org/x/tools/go/packages"
 
-	"github.com/Fabianexe/go-jenkins-coverage/pkg/entity"
+	"github.com/Fabianexe/go2jenkins/pkg/entity"
 )
 
 func LoadSources(path string) (*entity.Project, error) {

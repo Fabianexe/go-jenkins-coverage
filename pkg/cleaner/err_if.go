@@ -4,7 +4,7 @@ import (
 	"go/ast"
 	"go/token"
 
-	"github.com/Fabianexe/go-jenkins-coverage/pkg/entity"
+	"github.com/Fabianexe/go2jenkins/pkg/entity"
 )
 
 // cleanErrorIf removes all error if statements from the package data

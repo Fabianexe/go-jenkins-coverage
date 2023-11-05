@@ -4,17 +4,17 @@ package commands
 import (
 	"github.com/spf13/cobra"
 
-	"github.com/Fabianexe/go-jenkins-coverage/pkg/cleaner"
-	"github.com/Fabianexe/go-jenkins-coverage/pkg/complexity"
-	"github.com/Fabianexe/go-jenkins-coverage/pkg/coverage"
-	"github.com/Fabianexe/go-jenkins-coverage/pkg/source"
-	"github.com/Fabianexe/go-jenkins-coverage/pkg/writer"
+	"github.com/Fabianexe/go2jenkins/pkg/cleaner"
+	"github.com/Fabianexe/go2jenkins/pkg/complexity"
+	"github.com/Fabianexe/go2jenkins/pkg/coverage"
+	"github.com/Fabianexe/go2jenkins/pkg/source"
+	"github.com/Fabianexe/go2jenkins/pkg/writer"
 )
 
 func RootCommand() {
 	var rootCmd = &cobra.Command{ //nolint:gochecknoglobals
-		Use:   "jcoverage",
-		Short: "jcoverage creates coverage files for golang that the Jenkins coverage plugin can read and display.",
+		Use:   "go2jenkins",
+		Short: "go2jenkins creates coverage files for golang that the Jenkins coverage plugin can read and display.",
 		Run: func(cmd *cobra.Command, _ []string) {
 			sourcePath, err := cmd.Flags().GetString("source")
 			if err != nil {

@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/Fabianexe/go-jenkins-coverage/pkg/commands"
+	"github.com/Fabianexe/go2jenkins/pkg/commands"
 )
 
 func main() {

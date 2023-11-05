@@ -2,7 +2,7 @@
 package cleaner
 
 import (
-	"github.com/Fabianexe/go-jenkins-coverage/pkg/entity"
+	"github.com/Fabianexe/go2jenkins/pkg/entity"
 )
 
 // CleanData cleanes the package data

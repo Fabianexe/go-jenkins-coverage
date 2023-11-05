@@ -1,4 +1,4 @@
-# go-jenkins-coverage
+# go2jenkins
 Create coverage files for golang that the Jenkins coverage plugin can read and display.
 
 ## The accuracy of `go test -coverprofile`

@@ -3,7 +3,7 @@ package cleaner
 import (
 	"strings"
 
-	"github.com/Fabianexe/go-jenkins-coverage/pkg/entity"
+	"github.com/Fabianexe/go2jenkins/pkg/entity"
 )
 
 func cleanGeneratedFiles(project *entity.Project) *entity.Project {

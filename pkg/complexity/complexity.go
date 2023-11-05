@@ -2,7 +2,7 @@
 package complexity
 
 import (
-	"github.com/Fabianexe/go-jenkins-coverage/pkg/entity"
+	"github.com/Fabianexe/go2jenkins/pkg/entity"
 )
 
 // AddComplexity adds complexity metrics to the packages

@@ -7,7 +7,7 @@ import (
 
 	"golang.org/x/tools/cover"
 
-	"github.com/Fabianexe/go-jenkins-coverage/pkg/entity"
+	"github.com/Fabianexe/go2jenkins/pkg/entity"
 )
 
 // LoadCoverage loads the coverage data from the given file
