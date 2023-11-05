@@ -6,7 +6,10 @@ import (
 )
 
 // CleanData cleanes the package data
-// TODO: implement
 func CleanData(project *entity.Project) *entity.Project {
+	project = cleanGeneratedFiles(project)
+	project = cleanNoneCodeLines(project)
+	// todo clean error ifs (optional)
+
 	return project
 }
