@@ -30,10 +30,19 @@ func LoadCoverage(project *entity.Project, coverageReport string) (*entity.Proje
 					continue
 				}
 				for _, b := range p.Blocks {
+					if b.Count == 0 {
+						continue
+					}
+
 					for _, method := range f.Methods {
 						for _, line := range method.Lines {
 							if b.StartLine <= line.Number && line.Number <= b.EndLine {
 								line.CoverageCount += b.Count
+							}
+						}
+						for _, branch := range method.Branches {
+							if b.StartLine <= branch.EndeLine && b.EndLine >= branch.StartLine {
+								branch.Covered = true
 							}
 						}
 					}
@@ -47,6 +56,7 @@ func LoadCoverage(project *entity.Project, coverageReport string) (*entity.Proje
 	}
 
 	updateLineCoverage(project)
+	updateBranchCoverage(project)
 
 	return project, nil
 }
@@ -61,6 +71,23 @@ func updateLineCoverage(project *entity.Project) {
 					f.LineCoverage.AddLine(isCovered)
 					pack.LineCoverage.AddLine(isCovered)
 					project.LineCoverage.AddLine(isCovered)
+
+				}
+			}
+		}
+	}
+}
+
+func updateBranchCoverage(project *entity.Project) {
+	for _, pack := range project.Packages {
+		for _, f := range pack.Files {
+			for _, method := range f.Methods {
+				for _, branch := range method.Branches {
+					isCovered := branch.Covered
+					method.BranchCoverage.AddBranch(isCovered)
+					f.BranchCoverage.AddBranch(isCovered)
+					pack.BranchCoverage.AddBranch(isCovered)
+					project.BranchCoverage.AddBranch(isCovered)
 
 				}
 			}

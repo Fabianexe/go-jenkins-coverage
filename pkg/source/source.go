@@ -59,6 +59,7 @@ func LoadSources(path string) (*entity.Project, error) {
 			}
 			for _, decl := range fileAst.Decls {
 				if fun, ok := decl.(*ast.FuncDecl); ok {
+
 					method := &entity.Method{
 						Name: fun.Name.Name,
 						Body: fun.Body,
@@ -76,6 +77,13 @@ func LoadSources(path string) (*entity.Project, error) {
 						lines = append(lines, &entity.Line{Number: i})
 					}
 					method.Lines = lines
+					bV := &branchVisitor{
+						fset: pkg.Fset,
+					}
+
+					ast.Walk(bV, fun)
+
+					method.Branches = bV.branches
 
 					file.Methods = append(file.Methods, method)
 				}

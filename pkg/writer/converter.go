@@ -16,7 +16,8 @@ func ConvertToCobertura(path string, project *entity.Project) *Coverage {
 				},
 			},
 		},
-		LineRate: project.LineCoverage.String(),
+		LineRate:   project.LineCoverage.String(),
+		BranchRate: project.BranchCoverage.String(),
 	}
 
 	packages := &Packages{
@@ -24,8 +25,9 @@ func ConvertToCobertura(path string, project *entity.Project) *Coverage {
 	}
 	for _, pkg := range pkgs {
 		packageCov := &Package{
-			Name:     pkg.Name,
-			LineRate: pkg.LineCoverage.String(),
+			Name:       pkg.Name,
+			LineRate:   pkg.LineCoverage.String(),
+			BranchRate: pkg.BranchCoverage.String(),
 		}
 
 		classes := &Classes{
@@ -34,9 +36,10 @@ func ConvertToCobertura(path string, project *entity.Project) *Coverage {
 
 		for _, file := range pkg.Files {
 			class := &Class{
-				Name:     file.Name,
-				Filename: file.FilePath,
-				LineRate: file.LineCoverage.String(),
+				Name:       file.Name,
+				Filename:   file.FilePath,
+				LineRate:   file.LineCoverage.String(),
+				BranchRate: file.BranchCoverage.String(),
 			}
 
 			mmethods := &Methods{
@@ -49,8 +52,9 @@ func ConvertToCobertura(path string, project *entity.Project) *Coverage {
 
 			for _, method := range file.Methods {
 				xmlMethod := &Method{
-					Name:     method.Name,
-					LineRate: method.LineCoverage.String(),
+					Name:       method.Name,
+					LineRate:   method.LineCoverage.String(),
+					BranchRate: method.BranchCoverage.String(),
 				}
 
 				methodsLines := &Lines{

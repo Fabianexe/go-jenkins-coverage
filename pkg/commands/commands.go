@@ -20,10 +20,12 @@ func RootCommand() {
 			if err != nil {
 				panic(err)
 			}
+
 			coveragePath, err := cmd.Flags().GetString("coverage")
 			if err != nil {
 				panic(err)
 			}
+
 			outputPath, err := cmd.Flags().GetString("output")
 			if err != nil {
 				panic(err)
