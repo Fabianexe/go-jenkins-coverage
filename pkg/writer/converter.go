@@ -16,8 +16,12 @@ func ConvertToCobertura(path string, project *entity.Project) *Coverage {
 				},
 			},
 		},
-		LineRate:   project.LineCoverage.String(),
-		BranchRate: project.BranchCoverage.String(),
+		LineRate:        project.LineCoverage.String(),
+		BranchRate:      project.BranchCoverage.String(),
+		LinesValid:      project.LineCoverage.ValidString(),
+		LinesCovered:    project.LineCoverage.CoveredString(),
+		BranchesValid:   project.BranchCoverage.ValidString(),
+		BranchesCovered: project.BranchCoverage.CoveredString(),
 	}
 
 	packages := &Packages{
