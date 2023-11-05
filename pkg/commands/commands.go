@@ -31,12 +31,32 @@ func RootCommand() {
 				panic(err)
 			}
 
+			generatedFiles, err := cmd.Flags().GetBool("generatedFiles")
+			if err != nil {
+				panic(err)
+			}
+
+			noneCodeLines, err := cmd.Flags().GetBool("noneCodeLines")
+			if err != nil {
+				panic(err)
+			}
+
+			errorIf, err := cmd.Flags().GetBool("errorIf")
+			if err != nil {
+				panic(err)
+			}
+
 			project, err := source.LoadSources(sourcePath)
 			if err != nil {
 				panic(err)
 			}
 
-			project = cleaner.CleanData(project)
+			project = cleaner.CleanData(
+				project,
+				!generatedFiles,
+				!noneCodeLines,
+				!errorIf,
+			)
 
 			project = complexity.AddComplexity(project)
 
@@ -58,8 +78,8 @@ func RootCommand() {
 	rootCmd.PersistentFlags().StringP(
 		"source",
 		"s",
-		".",
-		"Give The source path to the go project.",
+		"./",
+		"Give the source path to the go project.",
 	)
 
 	rootCmd.PersistentFlags().StringP(
@@ -74,6 +94,24 @@ func RootCommand() {
 		"o",
 		"coverage.xml",
 		"The output file name",
+	)
+
+	rootCmd.PersistentFlags().Bool(
+		"generatedFiles",
+		false,
+		"If flag is given generated files are part of the output",
+	)
+
+	rootCmd.PersistentFlags().Bool(
+		"noneCodeLines",
+		false,
+		"If flag is given non code lines in functions are part of the output",
+	)
+
+	rootCmd.PersistentFlags().Bool(
+		"errorIf",
+		false,
+		"If flag is given err ifs are part of the output",
 	)
 
 	if err := rootCmd.Execute(); err != nil {

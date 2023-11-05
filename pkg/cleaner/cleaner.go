@@ -6,10 +6,23 @@ import (
 )
 
 // CleanData cleanes the package data
-func CleanData(project *entity.Project) *entity.Project {
-	project = cleanGeneratedFiles(project)
-	project = cleanNoneCodeLines(project)
-	// todo clean error ifs (optional)
+func CleanData(
+	project *entity.Project,
+	cGeneratedFiles bool,
+	cNoneCodeLines bool,
+	cErrorIf bool,
+) *entity.Project {
+	if cGeneratedFiles {
+		project = cleanGeneratedFiles(project)
+	}
+
+	if cNoneCodeLines {
+		project = cleanNoneCodeLines(project)
+	}
+
+	if cErrorIf {
+		project = cleanErrorIf(project)
+	}
 
 	return project
 }
