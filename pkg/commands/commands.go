@@ -46,6 +46,11 @@ func RootCommand() {
 				panic(err)
 			}
 
+			cyclomatic, err := cmd.Flags().GetBool("cyclomatic")
+			if err != nil {
+				panic(err)
+			}
+
 			project, err := source.LoadSources(sourcePath)
 			if err != nil {
 				panic(err)
@@ -58,7 +63,7 @@ func RootCommand() {
 				!errorIf,
 			)
 
-			project = complexity.AddComplexity(project)
+			project = complexity.AddComplexity(project, cyclomatic, !errorIf)
 
 			if coveragePath != "-" {
 				project, err = coverage.LoadCoverage(project, coveragePath)
@@ -112,6 +117,12 @@ func RootCommand() {
 		"errorIf",
 		false,
 		"If flag is given err ifs are part of the output",
+	)
+
+	rootCmd.PersistentFlags().Bool(
+		"cyclomatic",
+		false,
+		"If flag is given cyclomatic complexity is used instead of cognitive complexity",
 	)
 
 	if err := rootCmd.Execute(); err != nil {

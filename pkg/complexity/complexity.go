@@ -6,7 +6,18 @@ import (
 )
 
 // AddComplexity adds complexity metrics to the packages
-// TODO: implement
-func AddComplexity(project *entity.Project) *entity.Project {
+func AddComplexity(project *entity.Project, useCyclomaticComplexity bool, ignoreErrorIF bool) *entity.Project {
+	for _, p := range project.Packages {
+		for _, f := range p.Files {
+			for _, method := range f.Methods {
+				if useCyclomaticComplexity {
+					method.Complexity = getCyclomaticComplexity(method.Body, ignoreErrorIF)
+				} else {
+					method.Complexity = getCognitiveComplexity(method.Body, ignoreErrorIF)
+				}
+			}
+		}
+	}
+
 	return project
 }

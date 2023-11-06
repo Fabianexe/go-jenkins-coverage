@@ -36,6 +36,7 @@ type Method struct {
 	Branches       []*Branch
 	LineCoverage   LineCounter
 	BranchCoverage BranchCounter
+	Complexity     int
 }
 
 type Line struct {

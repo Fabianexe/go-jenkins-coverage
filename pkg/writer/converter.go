@@ -27,12 +27,15 @@ func ConvertToCobertura(path string, project *entity.Project) *Coverage {
 	packages := &Packages{
 		Packages: make([]*Package, 0, len(pkgs)),
 	}
+	totalComplexity := 0
 	for _, pkg := range pkgs {
 		packageCov := &Package{
 			Name:       pkg.Name,
 			LineRate:   pkg.LineCoverage.String(),
 			BranchRate: pkg.BranchCoverage.String(),
 		}
+
+		packageComplexity := 0
 
 		classes := &Classes{
 			Classes: make([]*Class, 0, len(pkg.Files)),
@@ -46,7 +49,9 @@ func ConvertToCobertura(path string, project *entity.Project) *Coverage {
 				BranchRate: file.BranchCoverage.String(),
 			}
 
-			mmethods := &Methods{
+			classComplexity := 0
+
+			methods := &Methods{
 				Methods: make([]*Method, 0, len(file.Methods)),
 			}
 
@@ -59,7 +64,12 @@ func ConvertToCobertura(path string, project *entity.Project) *Coverage {
 					Name:       method.Name,
 					LineRate:   method.LineCoverage.String(),
 					BranchRate: method.BranchCoverage.String(),
+					Complexity: strconv.Itoa(method.Complexity),
 				}
+
+				totalComplexity += method.Complexity
+				packageComplexity += method.Complexity
+				classComplexity += method.Complexity
 
 				methodsLines := &Lines{
 					Lines: make([]*Line, 0, len(method.Lines)),
@@ -78,15 +88,17 @@ func ConvertToCobertura(path string, project *entity.Project) *Coverage {
 					xmlMethod.Lines = methodsLines
 				}
 
-				mmethods.Methods = append(mmethods.Methods, xmlMethod)
+				methods.Methods = append(methods.Methods, xmlMethod)
 			}
-			if len(mmethods.Methods) != 0 {
-				class.Methods = mmethods
+			if len(methods.Methods) != 0 {
+				class.Methods = methods
 			}
 
 			if len(classLines.Lines) != 0 {
 				class.Lines = classLines
 			}
+
+			class.Complexity = strconv.Itoa(classComplexity)
 
 			classes.Classes = append(classes.Classes, class)
 		}
@@ -95,11 +107,15 @@ func ConvertToCobertura(path string, project *entity.Project) *Coverage {
 			packageCov.Classes = classes
 		}
 
+		packageCov.Complexity = strconv.Itoa(packageComplexity)
+
 		packages.Packages = append(packages.Packages, packageCov)
 	}
 	if len(packages.Packages) != 0 {
 		coverage.Packages = packages
 	}
+
+	coverage.Complexity = strconv.Itoa(totalComplexity)
 
 	return coverage
 }
