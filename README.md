@@ -1,6 +1,37 @@
 # go2jenkins
 Create coverage files for golang that the Jenkins coverage plugin can read and display.
 
+## Installation
+Simple install it by `go install`:
+```
+go install https://github.com/Fabianexe/go2jenkins@latest
+```
+
+## Usage
+`go2jenkins` can be run without any arguments.
+Howver, this means that it will for sources in the current directory, 
+do not add coverage data and write a `coverage.xml` in the current directory.
+
+So some flags exists to change this behavior:
+### Flags
+* `-h` or `--help` to get a help message
+* `-s` or `--source` to specify the source directory
+* `-c` or `--coverage` to specify the coverage profile as written by `go test -coverprofile`
+* `-o` or `--output` to specify the output file
+
+Beside these flags, the following flags can be used to change the behavior of the coverage report:
+*  `--cyclomatic` to use cyclomatic complexity metrics (default is cognitive complexity)
+*  `--generatedFiles` to include generated files in the coverage report 
+* `--noneCodeLines` to include none code lines in the coverage report 
+* `--errorIf` to include error ifs in the coverage report 
+
+### Example
+```
+go2jenkins -s ./src -c ./coverage.out -o ./coverage.xml
+```
+This will create a coverage report for the sources in the `./src` directory,
+using the coverage profile `./coverage.out` and write the report to `./coverage.xml`.
+
 ## The accuracy of `go test -coverprofile`
 The `go test -coverprofile` command is a great tool to get coverage information about your project.
 However, it measures the coverage on a bock level. This means that if you function conatins empty lines, only comments, 
@@ -15,7 +46,7 @@ Thus, we add branch coverage on method and file level. Where such multi conditio
 
 ## Others
 So far we are aware about two other projects that do something similar:
-* [gocov-xml](https://github.com/axw/gocov-xml)
+* [gocov-xml](https://github.com/AlekSi/gocov-xml)
 * [gocover-cobertura](https://github.com/boumenot/gocover-cobertura) 
 
 However, both of them focus on the coverage part and take over a big downsides of the `go test -coverprofile` command.
