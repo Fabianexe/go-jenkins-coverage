@@ -55,12 +55,7 @@ func LoadSources(path string) (*entity.Project, error) {
 
 		slog.Debug("Package", "Path", pkg.PkgPath, "Files", len(pkg.Syntax))
 		for i, fileAst := range pkg.Syntax {
-			file := &entity.File{
-				Name:     filepath.Base(pkg.GoFiles[i]),
-				FilePath: pkg.GoFiles[i],
-				Ast:      fileAst,
-				Methods:  make([]*entity.Method, 0, len(fileAst.Decls)),
-			}
+			methodsMap := make(map[string][]*entity.Method)
 			for _, decl := range fileAst.Decls {
 				if fun, ok := decl.(*ast.FuncDecl); ok {
 					method := &entity.Method{
@@ -89,14 +84,56 @@ func LoadSources(path string) (*entity.Project, error) {
 					method.Branches = bV.branches
 
 					countMethods++
-					file.Methods = append(file.Methods, method)
+					if fun.Recv == nil {
+						methodsMap["-"] = append(methodsMap["-"], method)
+						continue
+					}
+					var className string
+					if star, ok := fun.Recv.List[0].Type.(*ast.StarExpr); ok {
+						if index, ok := star.X.(*ast.IndexExpr); ok {
+							className = index.X.(*ast.Ident).Name
+							continue
+						}
+
+						if index, ok := star.X.(*ast.IndexListExpr); ok {
+							className = index.X.(*ast.Ident).Name
+							continue
+						}
+
+						className = star.X.(*ast.Ident).Name
+					} else {
+						if index, ok := fun.Recv.List[0].Type.(*ast.IndexExpr); ok {
+							className = index.X.(*ast.Ident).Name
+							continue
+						}
+
+						if index, ok := fun.Recv.List[0].Type.(*ast.IndexListExpr); ok {
+							className = index.X.(*ast.Ident).Name
+							continue
+						}
+
+						className = fun.Recv.List[0].Type.(*ast.Ident).Name
+					}
+					methodsMap[className] = append(methodsMap[className], method)
 				}
 			}
 
-			slog.Debug("File", "Name", file.Name, "Methods", len(file.Methods))
+			var methodCount int
+			for className, methods := range methodsMap {
+				file := &entity.File{
+					Name:     className,
+					FilePath: pkg.GoFiles[i],
+					Ast:      fileAst,
+					Methods:  methods,
+				}
+				pack.Files = append(pack.Files, file)
+
+				methodCount += len(methods)
+			}
+
+			slog.Debug("File", "Name", filepath.Base(pkg.GoFiles[i]), "Methods", methodCount)
 
 			countFiles++
-			pack.Files = append(pack.Files, file)
 		}
 
 		countPackages++
