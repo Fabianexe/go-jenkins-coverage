@@ -3,6 +3,7 @@ package cleaner
 import (
 	"go/ast"
 	"go/token"
+	"log/slog"
 
 	"github.com/Fabianexe/go2jenkins/pkg/entity"
 	"github.com/Fabianexe/go2jenkins/pkg/utility"
@@ -11,14 +12,18 @@ import (
 // cleanErrorIf removes all error if statements from the package data
 // An error if statement is an if statement that checks if a variable x is not nil, x is named err or is of type error and has only a return statement in the body.
 func cleanErrorIf(project *entity.Project) *entity.Project {
+	slog.Info("Clean error if statements")
 	for _, p := range project.Packages {
 		for _, f := range p.Files {
+			var countErrorIf int
 			for _, method := range f.Methods {
 				cleanErrorIfVisitor := &cleanErrorIfVisitor{
 					fset: p.Fset,
 				}
 
 				ast.Walk(cleanErrorIfVisitor, method.Body)
+
+				countErrorIf += len(cleanErrorIfVisitor.errorIfs)
 
 				for _, errIf := range cleanErrorIfVisitor.errorIfs {
 					i := 0
@@ -43,6 +48,9 @@ func cleanErrorIf(project *entity.Project) *entity.Project {
 						i++
 					}
 				}
+			}
+			if countErrorIf > 0 {
+				slog.Debug("Cleaned error if statements", "File", f.FilePath, "ErrorIfs", countErrorIf)
 			}
 		}
 	}

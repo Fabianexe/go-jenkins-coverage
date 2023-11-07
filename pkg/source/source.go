@@ -3,6 +3,7 @@ package source
 
 import (
 	"go/ast"
+	"log/slog"
 	"os"
 	"path/filepath"
 
@@ -43,6 +44,7 @@ func LoadSources(path string) (*entity.Project, error) {
 		return nil, err
 	}
 
+	var countPackages, countFiles, countMethods int
 	allPackages := make([]*entity.Package, 0, len(pkgs))
 	for _, pkg := range pkgs {
 		pack := &entity.Package{
@@ -50,6 +52,8 @@ func LoadSources(path string) (*entity.Project, error) {
 			Files: make([]*entity.File, 0, len(pkg.Syntax)),
 			Fset:  pkg.Fset,
 		}
+
+		slog.Debug("Package", "Path", pkg.PkgPath, "Files", len(pkg.Syntax))
 		for i, fileAst := range pkg.Syntax {
 			file := &entity.File{
 				Name:     filepath.Base(pkg.GoFiles[i]),
@@ -59,7 +63,6 @@ func LoadSources(path string) (*entity.Project, error) {
 			}
 			for _, decl := range fileAst.Decls {
 				if fun, ok := decl.(*ast.FuncDecl); ok {
-
 					method := &entity.Method{
 						Name: fun.Name.Name,
 						Body: fun.Body,
@@ -85,15 +88,20 @@ func LoadSources(path string) (*entity.Project, error) {
 
 					method.Branches = bV.branches
 
+					countMethods++
 					file.Methods = append(file.Methods, method)
 				}
 			}
 
+			slog.Debug("File", "Name", file.Name, "Methods", len(file.Methods))
+
+			countFiles++
 			pack.Files = append(pack.Files, file)
 		}
 
+		countPackages++
 		allPackages = append(allPackages, pack)
 	}
-
+	slog.Info("Source reading Finished", "Packages", countPackages, " Files", countFiles, " Methods", countMethods)
 	return &entity.Project{Packages: allPackages}, nil
 }

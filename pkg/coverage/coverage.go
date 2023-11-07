@@ -2,6 +2,7 @@
 package coverage
 
 import (
+	"log/slog"
 	"path/filepath"
 	"strings"
 
@@ -18,6 +19,7 @@ func LoadCoverage(project *entity.Project, coverageReport string) (*entity.Proje
 	}
 
 	for _, p := range profiles {
+		slog.Debug("Profile", "Path", p.FileName, "Blocks", len(p.Blocks))
 		found := false
 		for _, pack := range project.Packages {
 			if !strings.HasPrefix(p.FileName, pack.Name) {
@@ -51,7 +53,7 @@ func LoadCoverage(project *entity.Project, coverageReport string) (*entity.Proje
 
 		}
 		if !found {
-			println("Not found source for :" + p.FileName)
+			slog.Warn("Not found source for: " + p.FileName)
 		}
 	}
 

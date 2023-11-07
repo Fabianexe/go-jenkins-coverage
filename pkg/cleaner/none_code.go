@@ -3,13 +3,16 @@ package cleaner
 import (
 	"go/ast"
 	"go/token"
+	"log/slog"
 
 	"github.com/Fabianexe/go2jenkins/pkg/entity"
 )
 
 func cleanNoneCodeLines(project *entity.Project) *entity.Project {
+	slog.Info("Clean none code lines")
 	for _, p := range project.Packages {
 		for _, f := range p.Files {
+			var cleanedLines int
 			for _, method := range f.Methods {
 				noneCodeVisitor := &noneCodeVisitor{
 					validLines: make(map[int]struct{}, len(method.Lines)),
@@ -22,12 +25,16 @@ func cleanNoneCodeLines(project *entity.Project) *entity.Project {
 				for i < len(method.Lines) {
 					line := method.Lines[i]
 					if _, ok := noneCodeVisitor.validLines[line.Number]; !ok {
+						cleanedLines++
 						method.Lines = append(method.Lines[:i], method.Lines[i+1:]...)
 						continue
 					}
 
 					i++
 				}
+			}
+			if cleanedLines > 0 {
+				slog.Debug("Cleaned lines", "File", f.FilePath, "Lines", cleanedLines)
 			}
 		}
 	}

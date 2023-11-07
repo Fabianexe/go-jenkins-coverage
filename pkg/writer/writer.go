@@ -4,6 +4,7 @@ package writer
 
 import (
 	"encoding/xml"
+	"log/slog"
 	"os"
 
 	"github.com/Fabianexe/go2jenkins/pkg/entity"
@@ -20,6 +21,7 @@ func WriteXML(path string, project *entity.Project, outPath string) error {
 	encoder := xml.NewEncoder(outFile)
 	encoder.Indent("", "\t")
 
+	slog.Info("Write coverage to file", "Path", outPath)
 	err = encoder.Encode(xmlCoverage)
 	if err != nil {
 		return err

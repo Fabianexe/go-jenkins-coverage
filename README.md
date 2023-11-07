@@ -18,6 +18,7 @@ So some flags exists to change this behavior:
 * `-s` or `--source` to specify the source directory
 * `-c` or `--coverage` to specify the coverage profile as written by `go test -coverprofile`
 * `-o` or `--output` to specify the output file
+* `-v` or `--verbose` to get more output. Can be used multiple times to increase the verbosity
 
 Beside these flags, the following flags can be used to change the behavior of the coverage report:
 *  `--cyclomatic` to use cyclomatic complexity metrics (default is cognitive complexity)
