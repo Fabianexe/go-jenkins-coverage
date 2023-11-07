@@ -28,7 +28,7 @@ func LoadCoverage(project *entity.Project, coverageReport string) (*entity.Proje
 			found = true
 			filename := filepath.Base(p.FileName)
 			for _, f := range pack.Files {
-				if f.Name != filename {
+				if filepath.Base(f.FilePath) != filename {
 					continue
 				}
 				for _, b := range p.Blocks {
