@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log/slog"
 	"os"
+	"path/filepath"
 
 	"github.com/spf13/cobra"
 
@@ -59,6 +60,12 @@ func RootCommand() {
 			}
 
 			cyclomatic, err := cmd.Flags().GetBool("cyclomatic")
+			if err != nil {
+				slog.Error(fmt.Sprintf("%+v", err))
+				os.Exit(1)
+			}
+
+			sourcePath, err = filepath.Abs(sourcePath)
 			if err != nil {
 				slog.Error(fmt.Sprintf("%+v", err))
 				os.Exit(1)
