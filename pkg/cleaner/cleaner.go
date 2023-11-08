@@ -5,7 +5,7 @@ import (
 	"github.com/Fabianexe/go2jenkins/pkg/entity"
 )
 
-// CleanData cleanes the package data
+// CleanData cleans the package data
 func CleanData(
 	project *entity.Project,
 	cGeneratedFiles bool,

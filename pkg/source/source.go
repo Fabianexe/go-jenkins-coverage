@@ -13,20 +13,9 @@ import (
 )
 
 func LoadSources(path string) (*entity.Project, error) {
-	goPath := make(map[string]struct{}, 1000)
-	err := filepath.Walk(path, func(path string, info os.FileInfo, err error) error {
-		if filepath.Ext(path) == ".go" {
-			goPath[filepath.Dir(path)] = struct{}{}
-		}
-		return nil
-	})
+	goPackages, err := getGoPaths(path)
 	if err != nil {
 		return nil, err
-	}
-
-	gofiles := make([]string, 0, len(goPath))
-	for pack := range goPath {
-		gofiles = append(gofiles, pack)
 	}
 
 	cfg := &packages.Config{
@@ -39,7 +28,7 @@ func LoadSources(path string) (*entity.Project, error) {
 		Dir: path,
 	}
 
-	pkgs, err := packages.Load(cfg, gofiles...)
+	pkgs, err := packages.Load(cfg, goPackages...)
 	if err != nil {
 		return nil, err
 	}
@@ -64,7 +53,7 @@ func LoadSources(path string) (*entity.Project, error) {
 					}
 
 					// start after the function declaration
-					startLine := pkg.Fset.Position(fun.Pos()).Line + 1
+					startLine := pkg.Fset.Position(fun.Body.Lbrace).Line + 1
 					endLine := pkg.Fset.Position(fun.End()).Line
 					if startLine >= endLine {
 						continue
@@ -84,36 +73,7 @@ func LoadSources(path string) (*entity.Project, error) {
 					method.Branches = bV.branches
 
 					countMethods++
-					if fun.Recv == nil {
-						methodsMap["-"] = append(methodsMap["-"], method)
-						continue
-					}
-					var className string
-					if star, ok := fun.Recv.List[0].Type.(*ast.StarExpr); ok {
-						if index, ok := star.X.(*ast.IndexExpr); ok {
-							className = index.X.(*ast.Ident).Name
-							continue
-						}
-
-						if index, ok := star.X.(*ast.IndexListExpr); ok {
-							className = index.X.(*ast.Ident).Name
-							continue
-						}
-
-						className = star.X.(*ast.Ident).Name
-					} else {
-						if index, ok := fun.Recv.List[0].Type.(*ast.IndexExpr); ok {
-							className = index.X.(*ast.Ident).Name
-							continue
-						}
-
-						if index, ok := fun.Recv.List[0].Type.(*ast.IndexListExpr); ok {
-							className = index.X.(*ast.Ident).Name
-							continue
-						}
-
-						className = fun.Recv.List[0].Type.(*ast.Ident).Name
-					}
+					className := getClassName(fun)
 					methodsMap[className] = append(methodsMap[className], method)
 				}
 			}
@@ -141,4 +101,51 @@ func LoadSources(path string) (*entity.Project, error) {
 	}
 	slog.Info("Source reading Finished", "Packages", countPackages, " Files", countFiles, " Methods", countMethods)
 	return &entity.Project{Packages: allPackages}, nil
+}
+
+func getGoPaths(path string) ([]string, error) {
+	goPath := make(map[string]struct{}, 1000)
+	err := filepath.Walk(path, func(path string, info os.FileInfo, err error) error {
+		if filepath.Ext(path) == ".go" {
+			goPath[filepath.Dir(path)] = struct{}{}
+		}
+		return nil
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	goPackages := make([]string, 0, len(goPath))
+	for pack := range goPath {
+		goPackages = append(goPackages, pack)
+	}
+	return goPackages, nil
+}
+
+func getClassName(fun *ast.FuncDecl) string {
+	if fun.Recv == nil {
+		return "-"
+	}
+
+	if star, ok := fun.Recv.List[0].Type.(*ast.StarExpr); ok {
+		if index, ok := star.X.(*ast.IndexExpr); ok {
+			return index.X.(*ast.Ident).Name
+		}
+
+		if index, ok := star.X.(*ast.IndexListExpr); ok {
+			return index.X.(*ast.Ident).Name
+		}
+
+		return star.X.(*ast.Ident).Name
+	}
+
+	if index, ok := fun.Recv.List[0].Type.(*ast.IndexExpr); ok {
+		return index.X.(*ast.Ident).Name
+	}
+
+	if index, ok := fun.Recv.List[0].Type.(*ast.IndexListExpr); ok {
+		return index.X.(*ast.Ident).Name
+	}
+
+	return fun.Recv.List[0].Type.(*ast.Ident).Name
 }

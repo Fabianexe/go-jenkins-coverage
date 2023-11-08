@@ -34,6 +34,14 @@ func IsErrorIf(node ast.Node) bool {
 		return false
 	}
 
+	if _, ok := v.Body.List[0].(*ast.ReturnStmt); !ok { // body is not a return statement
+		return false
+	}
+
+	return isErrorVar(cond)
+}
+
+func isErrorVar(cond *ast.BinaryExpr) bool {
 	object, ok := cond.X.(*ast.Ident)
 	if !ok || object.Obj == nil || object.Obj.Kind != ast.Var { // not a variable
 		return false
@@ -47,10 +55,6 @@ func IsErrorIf(node ast.Node) bool {
 		}
 
 		if n, ok := typ.Type.(*ast.Ident); !ok || n.Name != "error" { // not an error
-			return false
-		}
-
-		if _, ok := v.Body.List[0].(*ast.ReturnStmt); !ok { // body is not a return statement
 			return false
 		}
 	}
