@@ -1,5 +1,7 @@
 # go2jenkins
+![Create Jenkins coverage files for golang](./img/logo.png "Create Jenkins coverage files for golang")
 Create coverage files for golang that the Jenkins coverage plugin can read and display.
+Including complexity metrics and branch coverage.
 
 ## Installation
 Simple install it by `go install`:
