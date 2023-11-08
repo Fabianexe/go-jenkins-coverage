@@ -46,6 +46,7 @@ type Line struct {
 
 type Branch struct {
 	StartLine int
-	EndeLine  int
+	EndLine   int
+	DefLine   int
 	Covered   bool
 }

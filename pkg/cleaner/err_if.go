@@ -40,7 +40,7 @@ func cleanErrorIf(project *entity.Project) *entity.Project {
 					i = 0
 					for i < len(method.Branches) {
 						branch := method.Branches[i]
-						if branch.StartLine >= errIf.start && branch.EndeLine <= errIf.end {
+						if branch.StartLine >= errIf.start && branch.EndLine <= errIf.end {
 							method.Branches = append(method.Branches[:i], method.Branches[i+1:]...)
 							continue
 						}

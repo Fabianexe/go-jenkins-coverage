@@ -43,7 +43,7 @@ func LoadCoverage(project *entity.Project, coverageReport string) (*entity.Proje
 							}
 						}
 						for _, branch := range method.Branches {
-							if b.StartLine <= branch.EndeLine && b.EndLine >= branch.StartLine {
+							if b.StartLine <= branch.EndLine && b.EndLine >= branch.StartLine {
 								branch.Covered = true
 							}
 						}

@@ -15,36 +15,26 @@ type branchVisitor struct {
 func (b *branchVisitor) Visit(node ast.Node) (w ast.Visitor) {
 	switch v := node.(type) {
 	case *ast.CaseClause:
-		branch := &entity.Branch{}
-		branch.StartLine = b.fset.Position(v.Colon).Line + 1
-		branch.EndeLine = b.fset.Position(v.End()).Line
-		b.branches = append(b.branches, branch)
+		b.branches = append(b.branches, b.createBranch(v.Pos(), v.Colon, v.End()))
 	case *ast.CommClause:
-		branch := &entity.Branch{}
-		branch.StartLine = b.fset.Position(v.Colon).Line + 1
-		branch.EndeLine = b.fset.Position(v.End()).Line
-		b.branches = append(b.branches, branch)
+		b.branches = append(b.branches, b.createBranch(v.Pos(), v.Colon, v.End()))
 	case *ast.IfStmt:
-		branch := &entity.Branch{}
-		branch.StartLine = b.fset.Position(v.Body.Pos()).Line + 1
-		branch.EndeLine = b.fset.Position(v.Body.End()).Line
-		b.branches = append(b.branches, branch)
+		b.branches = append(b.branches, b.createBranch(v.Pos(), v.Body.Pos(), v.Body.End()))
 	case *ast.ForStmt:
-		branch := &entity.Branch{}
-		branch.StartLine = b.fset.Position(v.Body.Pos()).Line + 1
-		branch.EndeLine = b.fset.Position(v.Body.End()).Line
-		b.branches = append(b.branches, branch)
+		b.branches = append(b.branches, b.createBranch(v.Pos(), v.Body.Pos(), v.Body.End()))
 	case *ast.RangeStmt:
-		branch := &entity.Branch{}
-		branch.StartLine = b.fset.Position(v.Body.Pos()).Line + 1
-		branch.EndeLine = b.fset.Position(v.Body.End()).Line
-		b.branches = append(b.branches, branch)
+		b.branches = append(b.branches, b.createBranch(v.Pos(), v.Body.Pos(), v.Body.End()))
 	case *ast.FuncDecl:
-		branch := &entity.Branch{}
-		branch.StartLine = b.fset.Position(v.Body.Pos()).Line + 1
-		branch.EndeLine = b.fset.Position(v.Body.End()).Line
-		b.branches = append(b.branches, branch)
+		b.branches = append(b.branches, b.createBranch(v.Pos(), v.Body.Pos(), v.Body.End()))
 	}
 
 	return b
+}
+
+func (b *branchVisitor) createBranch(def, start, end token.Pos) *entity.Branch {
+	return &entity.Branch{
+		DefLine:   b.fset.Position(def).Line,
+		StartLine: b.fset.Position(start).Line + 1,
+		EndLine:   b.fset.Position(end).Line,
+	}
 }
