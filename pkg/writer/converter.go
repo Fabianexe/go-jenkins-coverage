@@ -75,10 +75,25 @@ func ConvertToCobertura(path string, project *entity.Project) *Coverage {
 					Lines: make([]*Line, 0, len(method.Lines)),
 				}
 
+				branchstarts := make([]int, 0, len(method.Branches))
+				for _, branch := range method.Branches[1:] {
+					branchstarts = append(branchstarts, branch.StartLine)
+				}
+
 				for _, line := range method.Lines {
 					xmlLine := &Line{
 						Number: strconv.Itoa(line.Number),
 						Hits:   strconv.Itoa(line.CoverageCount),
+						Branch: "false",
+					}
+					for i := 0; i < len(branchstarts); {
+						if line.Number >= branchstarts[i] {
+							xmlLine.Branch = "true"
+							branchstarts = append(branchstarts[:i], branchstarts[i+1:]...)
+							continue
+						}
+
+						i++
 					}
 					methodsLines.Lines = append(methodsLines.Lines, xmlLine)
 					classLines.Lines = append(classLines.Lines, xmlLine)
