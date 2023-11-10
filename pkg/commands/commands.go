@@ -65,6 +65,12 @@ func RootCommand() {
 				os.Exit(1)
 			}
 
+			fixMissedLines, err := cmd.Flags().GetBool("fixMissedLines")
+			if err != nil {
+				slog.Error(fmt.Sprintf("%+v", err))
+				os.Exit(1)
+			}
+
 			sourcePath, err = filepath.Abs(sourcePath)
 			if err != nil {
 				slog.Error(fmt.Sprintf("%+v", err))
@@ -91,7 +97,7 @@ func RootCommand() {
 
 			if coveragePath != "-" {
 				slog.Info("Load coverage")
-				project, err = coverage.LoadCoverage(project, coveragePath)
+				project, err = coverage.LoadCoverage(project, coveragePath, fixMissedLines)
 
 				if err != nil {
 					slog.Error(fmt.Sprintf("%+v", err))
@@ -151,6 +157,11 @@ func RootCommand() {
 		"cyclomatic",
 		false,
 		"If flag is given cyclomatic complexity is used instead of cognitive complexity",
+	)
+	rootCmd.PersistentFlags().Bool(
+		"fixMissedLines",
+		false,
+		"If flag is given lines that are not part of any go coverage block get there coverage from the containing branch",
 	)
 
 	verboseFlag := rootCmd.PersistentFlags().VarPF(

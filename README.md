@@ -53,7 +53,7 @@ So far we are aware about two other projects that do something similar:
 * [gocover-cobertura](https://github.com/boumenot/gocover-cobertura) 
 
 However, both of them focus on the coverage part and take over a big downsides of the `go test -coverprofile` command.
-Only packages with any coverage are included in the report. 
+Only packages with any coverage are included in the report ([will be fixed in go](https://go-review.googlesource.com/c/go/+/495447)).
 This means that if you have a package with no tests at all, it will not be included in the report. 
 This is a big problem if you want to have a complete report of your project or any meaningfully coverage metrics.
 

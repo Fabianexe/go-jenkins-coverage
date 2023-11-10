@@ -12,7 +12,7 @@ import (
 )
 
 // LoadCoverage loads the coverage data from the given file
-func LoadCoverage(project *entity.Project, coverageReport string) (*entity.Project, error) {
+func LoadCoverage(project *entity.Project, coverageReport string, fixMissedLines bool) (*entity.Project, error) {
 	profiles, err := cover.ParseProfiles(coverageReport)
 	if err != nil {
 		return nil, err
@@ -31,9 +31,7 @@ func LoadCoverage(project *entity.Project, coverageReport string) (*entity.Proje
 				if filepath.Base(f.FilePath) != filename {
 					continue
 				}
-				for _, b := range p.Blocks {
-					applyBlock(f, b)
-				}
+				applyBlocks(f.Methods, p.Blocks, fixMissedLines)
 			}
 
 		}
@@ -48,22 +46,53 @@ func LoadCoverage(project *entity.Project, coverageReport string) (*entity.Proje
 	return project, nil
 }
 
-func applyBlock(f *entity.File, b cover.ProfileBlock) {
-	if b.Count == 0 {
-		return
-	}
-	for _, method := range f.Methods {
-		for _, line := range method.Lines {
-			if b.StartLine <= line.Number && line.Number <= b.EndLine {
-				line.CoverageCount += b.Count
+func applyBlocks(methods []*entity.Method, blocks []cover.ProfileBlock, fixMissedLines bool) {
+	blockLines := make(map[int]struct{}, len(blocks))
+	for _, b := range blocks {
+		if b.Count == 0 {
+			continue
+		}
+		for _, method := range methods {
+			for _, line := range method.Lines {
+				if b.StartLine <= line.Number && line.Number <= b.EndLine {
+					line.CoverageCount += b.Count
+				}
+			}
+			for _, branch := range method.Branches {
+				if b.StartLine <= branch.EndLine && b.EndLine >= branch.StartLine {
+					branch.Covered = true
+				}
 			}
 		}
-		for _, branch := range method.Branches {
-			if b.StartLine <= branch.EndLine && b.EndLine >= branch.StartLine {
-				branch.Covered = true
+		for i := b.StartLine; i < b.EndLine; i++ {
+			blockLines[i] = struct{}{}
+		}
+	}
+
+	if fixMissedLines {
+		for _, method := range methods {
+			for _, line := range method.Lines {
+				if _, ok := blockLines[line.Number]; !ok {
+					line.CoverageCount = determineFromBranches(method.Branches, line.Number)
+				}
 			}
 		}
 	}
+}
+
+func determineFromBranches(branches []*entity.Branch, number int) int {
+	// branches are created by deep first search, so the last branch that cover the line is the one that is interesting
+	for i := len(branches) - 1; i >= 0; i-- {
+		branch := branches[i]
+		if branch.StartLine <= number && number <= branch.EndLine {
+			if branch.Covered {
+				return 1
+			}
+			return 0
+		}
+	}
+
+	return 0
 }
 
 func updateLineCoverage(project *entity.Project) {
